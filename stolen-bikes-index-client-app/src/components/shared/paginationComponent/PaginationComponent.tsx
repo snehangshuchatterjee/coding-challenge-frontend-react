@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 
-interface PaginationComponentProps {
+type PaginationComponentProps = {
     totalNoOfPages: number; 
     currentPageNumber: number;
+    clickHandler: (num: number) => void;
 }
 
 class PaginationComponent extends Component<PaginationComponentProps>{
@@ -29,6 +30,18 @@ class PaginationComponent extends Component<PaginationComponentProps>{
         });
     }
 
+    getPageButtons = () => {
+        var outputArray = [];
+        for(var index = 0; index < this.state.totalNoOfPages; index++){
+            outputArray.push(index+1);
+        }
+        return outputArray;
+    }
+
+    handleClickEvents = (num: number) => {
+        console.log(num);
+    }
+
     render = () => {
         console.log("this.state.totalNoOfPages :"+ this.state.totalNoOfPages);
         return(
@@ -37,21 +50,18 @@ class PaginationComponent extends Component<PaginationComponentProps>{
                     <li className="page-item">
                         <a className="page-link" href="#">Previous</a>
                     </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">1</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">2</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">3</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">4</a>
-                    </li>
-                    <li className="page-item">
-                        <a className="page-link" href="#">5</a>
-                    </li>
+
+                    {this.getPageButtons().map((pageNumber) => {
+                        return (
+                            <li className="page-item">
+                                <a className="page-link" href="#" onClick = {(event: React.MouseEvent<HTMLElement>) => {
+                                        this.props.clickHandler(pageNumber);
+                                    }}>{pageNumber}
+                                    </a>
+                            </li>
+                        );
+                    })}
+
                     <li className="page-item">
                         <a className="page-link" href="#">Next</a>
                     </li>
