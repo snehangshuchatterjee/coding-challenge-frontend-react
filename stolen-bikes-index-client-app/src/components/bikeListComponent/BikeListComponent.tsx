@@ -1,85 +1,153 @@
-import React, {Component} from 'react';
-import axios from 'axios';
-import CardComponent from '../shared/cardComponent/CardComponent';
-import PaginationComponent from '../shared/paginationComponent/PaginationComponent';
+import React, {Component} from "react";
+import ReactPaginate from "react-paginate";
+import AxiosController from "../../controllers/AxiosController";
+import FilterComponent from "../filterComponent/FilterComponent";
+import CardComponent from "../shared/cardComponent/CardComponent";
+import ErrorComponent from "../shared/errorComponent/ErrorComponent";
+import ModalComponent from "../shared/modalComponent/ModalComponent";
+
+interface IFilterDataObject {
+    subjectHeading: string;
+    fromDate: number;
+    toDate: number;
+}
 
 class BikeListComponent extends Component {
-    BASE_URL : string = 'https://bikewise.org/api/v2/incidents';
-    PAGE_NUMBER: number = 1;
-    ITEMS_PER_PAGE  : number = 10;
-    PROXIMITY: string = 'Berlin';
-    PROXIMITY_SQUARE: number = 100;
-    TOTAL_COUNT: number = 0;
-    LANDING_PAGE_NUMBER: number = 1;
-    
-    state = {
-        incidents : [],
+    public BASE_URL: string = "https://bikewise.org/api/v2/incidents";
+    public PAGE_NUMBER: number = 1;
+    public ITEMS_PER_PAGE: number = 10;
+    public PROXIMITY: string = "Berlin";
+    public PROXIMITY_SQUARE: number = 100;
+    public TOTAL_COUNT: number = 0;
+    public LANDING_PAGE_NUMBER: number = 0;
+    public QUERY: string = "";
+    public OCCURED_BEFORE: number = 0;
+    public OCCURED_AFTER: number = 0;
+    public ERROR_MESSAGE: string = "Oops, Something went wrong...";
+    public apiClass: AxiosController = new AxiosController();
+
+    public state = {
         incidentCount: 0,
-        isLoading: true
+        incidents : [],
+        isError : false,
+        isLoading: true,
     };
 
-    constructor(props: any){
+    constructor(props: any) {
         super(props);
     }
 
-    getITotalCountURL = () => {
-        var url = '';
-        url = this.BASE_URL+'?proximity='+this.PROXIMITY+'&proximity_square='+this.PROXIMITY_SQUARE;
+    public getBerlinDataURL = () => {
+        let url = "";
+        url = this.BASE_URL + "?proximity=" + this.PROXIMITY + "&proximity_square=" + this.PROXIMITY_SQUARE + "&query=" + this.QUERY;
+
+        url = (this.OCCURED_AFTER === 0) ? url : url + "&occurred_after=" + this.OCCURED_AFTER;
+        url = (this.OCCURED_BEFORE === 0) ? url : url + "&occurred_before=" + this.OCCURED_BEFORE;
+
         return url;
     }
 
-    getIncidentsPerPageURL = (page_number: number) => {
-        var url = '';
-        url = this.BASE_URL+'?page='+page_number+'&per_page='+this.ITEMS_PER_PAGE+'&proximity='+this.PROXIMITY+'&proximity_square='+this.PROXIMITY_SQUARE;
-        return url;
+    public componentDidMount = () => {
+        this.getData();
     }
 
-    componentDidMount() {
-        var me = this;
-        axios.get(this.getITotalCountURL())
+    public getData = () => {
+        const me = this;
+
+        this.apiClass.getData(this.getBerlinDataURL())
         .then(
             (response) => {
-                console.log(response.data.incidents);
-                me.TOTAL_COUNT = response.data.incidents.length;    
-                this.getDataPerPage(this.LANDING_PAGE_NUMBER);                
-            }
-        )
+                me.TOTAL_COUNT = response.data.incidents.length;
+                this.getDataPerPage({selected: this.LANDING_PAGE_NUMBER});
+            },
+        );
     }
 
-    getDataPerPage = (page_number: number) => {
-        axios.get(this.getIncidentsPerPageURL(page_number))
-        .then(
-            (response) => {
-                // console.log(response.data.incidents);
-                this.setState({
-                    incidents : response.data.incidents,
-                    incidentCount : this.TOTAL_COUNT,
-                    isLoading : false
-                });             
-            }
-        )
+    public getDataPerPage = (selectedItem: {selected: number}) => {
+        const me = this;
+        const pageNumber = selectedItem.selected + 1;
+        const url = this.getBerlinDataURL();
+
+        this.apiClass.getDataPerPage(url, pageNumber, this.ITEMS_PER_PAGE)
+        .then((response) => {
+            me.setState({
+                incidentCount: me.TOTAL_COUNT,
+                incidents : response.data.incidents,
+                isLoading: false,
+            });
+        })
+        .catch((error) => {
+            me.setState({
+                isError : true,
+            });
+        });
     }
 
-    render = () => {
-        if(this.state.isLoading){
+    public handleSearch = (stateObj: IFilterDataObject) => {
+        this.QUERY = stateObj.subjectHeading;
+        this.OCCURED_AFTER = stateObj.fromDate;
+        this.OCCURED_BEFORE = stateObj.toDate;
+
+        this.getData();
+    }
+
+    public closeErrorMessage = () => {
+        this.setState({
+            isError : false,
+        });
+    }
+
+    public render = () => {
+        if (this.state.isLoading) {
             return(
                 <div>
-                    Loading....
+                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <p>Loading....</p>
                 </div>
             );
-        }
-        else{
+        } else if (this.state.isError) {
             return(
                 <div>
-                    {this.state.incidents.map((incident: any) => {
-                        return <CardComponent key = {incident.id} title = {incident.title} description = {incident.description} thumbnailURL = {incident.media.image_url_thumb}/>
+                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <ErrorComponent errorMessage={this.ERROR_MESSAGE} closeButtonEventHandler={this.closeErrorMessage}/>
+                </div>
+            );
+        } else {
+            return(
+                <div>
+                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <div style={{position: "absolute", right: "30px", top: "90px"}}>
+                        <strong>Total Cases: </strong>{this.TOTAL_COUNT}
+                    </div>
+                    {
+                        this.state.incidents.length === 0 ?
+                            <p>No Results</p>
+                            :
+                            this.state.incidents.map((incident: any) => {
+                            return <CardComponent
+                                        key={incident.id}
+                                        incident={incident}
+                                    />;
                     })}
-                    <PaginationComponent    totalNoOfPages = {Math.ceil(this.state.incidentCount/this.ITEMS_PER_PAGE)} 
-                        currentPageNumber = {3} 
-                        clickHandler = {this.getDataPerPage.bind(this)}
+                    <ReactPaginate
+                        pageCount={Math.ceil(this.state.incidentCount / this.ITEMS_PER_PAGE)}
+                        pageRangeDisplayed={2}
+                        marginPagesDisplayed={1}
+                        initialPage={0}
+                        containerClassName={"pagination justify-content-center"}
+                        pageClassName={"page-item"}
+                        pageLinkClassName={"page-link"}
+                        breakClassName={"page-item"}
+                        breakLinkClassName={"page-link"}
+                        previousClassName={"page-item"}
+                        previousLinkClassName={"page-link"}
+                        nextClassName={"page-item"}
+                        nextLinkClassName={"page-link"}
+                        activeClassName={"page-item active"}
+                        onPageChange={this.getDataPerPage}
                     />
                 </div>
-            );            
+            );
         }
     }
 }

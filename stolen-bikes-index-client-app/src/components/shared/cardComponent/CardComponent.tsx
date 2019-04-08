@@ -1,69 +1,78 @@
-import React from 'react';
+import React from "react";
 
-import bikePic from '../../../resources/images/bike_pic.jpg';
+import bikePic from "../../../resources/images/bike_pic.jpg";
+import ModalComponent from "../modalComponent/ModalComponent";
 
-interface CardComponentProps{
-    key: number,
-    title : string;
-    description: string;
-    thumbnailURL: string;
+interface IncidentType {
+    incident: {
+        [key: string]: any,
+    };
+    showModal?: boolean;
 }
 
-class CardComponent extends React.Component<CardComponentProps>{
-    state = {
-        cardTitle : '',
-        cardDescription: '',
-        img_src:  ''
-    }
-    
+class CardComponent extends React.Component<IncidentType> {
+    public state: IncidentType = {
+        incident : {},
+        showModal: false,
+    };
 
-    constructor(props: any){
+    constructor(props: any) {
         super(props);
     }
 
-    componentDidMount = () => {
+    public componentDidMount = () => {
         this.setState({
-            cardTitle : this.props.title,
-            cardDescription: this.props.description,
-            img_src:  this.props.thumbnailURL
-        });
-        
-        console.log('this.props.title: '+this.props.thumbnailURL)
-    }
-
-    componentWillReceiveProps = (newProps: CardComponentProps) => {
-        this.setState({
-            cardTitle : newProps.title,
-            cardDescription: newProps.description,
-            img_src:  newProps.thumbnailURL
+            incident: this.props.incident,
         });
     }
 
-    getImageURL = (thumbNailURL: string) => {
-        console.log(thumbNailURL);
-        if(!thumbNailURL){
-            return bikePic
-        }
-        else{
+    public componentWillReceiveProps = (newProps: IncidentType) => {
+        this.setState({
+            incident: newProps.incident,
+        });
+    }
+
+    public getImageURL = (imageUrlObject: {image_url_thumb: string}) => {
+        const thumbNailURL = imageUrlObject ? imageUrlObject.image_url_thumb : undefined;
+        if (!thumbNailURL) {
+            return bikePic;
+        } else {
             return thumbNailURL;
         }
     }
-    
-    render(): JSX.Element{
-        console.log("render called in CardComponent for ID: "+ this.props.key);
+
+    public handleLinkClick = () => {
+        this.setState({
+            showModal : true,
+        });
+    }
+
+    public render(): JSX.Element {
+        const occuredDate: string = this.state.incident.occurred_at == "" ? "No Date Specified" : new Date(this.state.incident.occurred_at).toLocaleDateString();
         return(
-            <div className="media">
-                <div style = {{'padding': '10px'}}>
-                    <img className="mr-3" alt={bikePic} src= {this.getImageURL(this.state.img_src)}  width = '100px'/>
+            <div className="media border border-light rounded" style={{background : "#F7F5F5", padding: "10px", margin: "10px", maxHeight: "150px"}}>
+                <div style={{padding: "10px"}}>
+                    <img className="mr-3" alt="Sorry, No image" onError={(e)=>{e.target.onerror = null; e.target.src=bikePic}}  src={this.getImageURL(this.state.incident.media)}  width="100px" style = {{maxWidth: '100px'}}/>
                 </div>
                 <div className="media-body">
                     <h5 className="mt-0">
-                        {this.state.cardTitle}
-                    </h5> 
-                    {this.state.cardDescription}
+                        {this.state.incident.title ? this.state.incident.title : "No Title"}
+                    </h5>
+                    <div style={{height: "3em", overflow: "hidden"}}>
+                        {this.state.incident.description ? this.state.incident.description : "No Description"}
+                    </div>
+                    <div style={{position: "static", top: "40px", paddingTop: "10px"}}>
+                        <strong>Reported On: </strong>{occuredDate}
+                    </div>
+                    <div style={{textAlign: "end"}}>
+                        <a href="#" onClick={this.handleLinkClick}>Read More....</a>
+                    </div>
                 </div>
-            </div>           
-        )
+                <div>
+                    <ModalComponent incident={this.state.incident} showModal={this.state.showModal}/>
+                </div>
+            </div>
+        );
     }
 }
 
