@@ -39,7 +39,19 @@ class BikeListComponent extends Component {
 
     public getBerlinDataURL = () => {
         let url = "";
-        url = this.BASE_URL + "?proximity=" + this.PROXIMITY + "&proximity_square=" + this.PROXIMITY_SQUARE + "&query=" + this.QUERY;
+        url = this.BASE_URL
+                +
+                "?proximity="
+                +
+                this.PROXIMITY
+                +
+                "&proximity_square="
+                +
+                this.PROXIMITY_SQUARE
+                +
+                "&query="
+                +
+                this.QUERY;
 
         url = (this.OCCURED_AFTER === 0) ? url : url + "&occurred_after=" + this.OCCURED_AFTER;
         url = (this.OCCURED_BEFORE === 0) ? url : url + "&occurred_before=" + this.OCCURED_BEFORE;
@@ -52,32 +64,29 @@ class BikeListComponent extends Component {
     }
 
     public getData = () => {
-        const me = this;
-
         this.apiClass.getData(this.getBerlinDataURL())
         .then(
             (response) => {
-                me.TOTAL_COUNT = response.data.incidents.length;
+                this.TOTAL_COUNT = response.data.incidents.length;
                 this.getDataPerPage({selected: this.LANDING_PAGE_NUMBER});
             },
         );
     }
 
     public getDataPerPage = (selectedItem: {selected: number}) => {
-        const me = this;
         const pageNumber = selectedItem.selected + 1;
         const url = this.getBerlinDataURL();
 
         this.apiClass.getDataPerPage(url, pageNumber, this.ITEMS_PER_PAGE)
         .then((response) => {
-            me.setState({
-                incidentCount: me.TOTAL_COUNT,
+            this.setState({
+                incidentCount: this.TOTAL_COUNT,
                 incidents : response.data.incidents,
                 isLoading: false,
             });
         })
         .catch((error) => {
-            me.setState({
+            this.setState({
                 isError : true,
             });
         });
@@ -98,37 +107,41 @@ class BikeListComponent extends Component {
     }
 
     public render = () => {
+        const incidentLength = this.state.incidents.length;
         if (this.state.isLoading) {
             return(
                 <div>
-                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <FilterComponent handleSearch={this.handleSearch}/>
                     <p>Loading....</p>
                 </div>
             );
         } else if (this.state.isError) {
             return(
                 <div>
-                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <FilterComponent handleSearch={this.handleSearch}/>
                     <ErrorComponent errorMessage={this.ERROR_MESSAGE} closeButtonEventHandler={this.closeErrorMessage}/>
                 </div>
             );
         } else {
             return(
                 <div>
-                    <FilterComponent handleSearch={this.handleSearch.bind(this)}/>
+                    <FilterComponent handleSearch={this.handleSearch}/>
                     <div style={{position: "absolute", right: "30px", top: "90px"}}>
                         <strong>Total Cases: </strong>{this.TOTAL_COUNT}
                     </div>
                     {
-                        this.state.incidents.length === 0 ?
+                        incidentLength === 0 ?
                             <p>No Results</p>
                             :
                             this.state.incidents.map((incident: any) => {
-                            return <CardComponent
+                                return(
+                                    <CardComponent
                                         key={incident.id}
                                         incident={incident}
-                                    />;
-                    })}
+                                    />
+                                );
+                            })
+                    }
                     <ReactPaginate
                         pageCount={Math.ceil(this.state.incidentCount / this.ITEMS_PER_PAGE)}
                         pageRangeDisplayed={2}

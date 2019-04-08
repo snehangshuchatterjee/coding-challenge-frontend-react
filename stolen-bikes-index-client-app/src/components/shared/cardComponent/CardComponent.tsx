@@ -3,15 +3,15 @@ import React from "react";
 import bikePic from "../../../resources/images/bike_pic.jpg";
 import ModalComponent from "../modalComponent/ModalComponent";
 
-interface IncidentType {
+interface IIncidentType {
     incident: {
         [key: string]: any,
     };
     showModal?: boolean;
 }
 
-class CardComponent extends React.Component<IncidentType> {
-    public state: IncidentType = {
+class CardComponent extends React.Component<IIncidentType> {
+    public state: IIncidentType = {
         incident : {},
         showModal: false,
     };
@@ -26,7 +26,7 @@ class CardComponent extends React.Component<IncidentType> {
         });
     }
 
-    public componentWillReceiveProps = (newProps: IncidentType) => {
+    public componentWillReceiveProps = (newProps: IIncidentType) => {
         this.setState({
             incident: newProps.incident,
         });
@@ -48,11 +48,30 @@ class CardComponent extends React.Component<IncidentType> {
     }
 
     public render(): JSX.Element {
-        const occuredDate: string = this.state.incident.occurred_at == "" ? "No Date Specified" : new Date(this.state.incident.occurred_at).toLocaleDateString();
+        const occuredDate: string = this.state.incident.occurred_at === ""
+            ?
+                "No Date Specified"
+            : new Date(this.state.incident.occurred_at).toLocaleDateString();
         return(
-            <div className="media border border-light rounded" style={{background : "#F7F5F5", padding: "10px", margin: "10px", maxHeight: "150px"}}>
+            <div
+                className="media border border-light rounded"
+                style={
+                    {
+                        background : "#F7F5F5",
+                        margin: "10px",
+                        maxHeight: "150px",
+                        padding: "10px",
+                    }
+                }
+            >
                 <div style={{padding: "10px"}}>
-                    <img className="mr-3" alt="Sorry, No image" onError={(e)=>{e.target.onerror = null; e.target.src=bikePic}}  src={this.getImageURL(this.state.incident.media)}  width="100px" style = {{maxWidth: '100px'}}/>
+                    <img
+                        className="mr-3"
+                        alt="Sorry, Image not available"
+                        src={this.getImageURL(this.state.incident.media)}
+                        width="100px"
+                        style={{maxWidth: "100px"}}
+                    />
                 </div>
                 <div className="media-body">
                     <h5 className="mt-0">
@@ -64,12 +83,16 @@ class CardComponent extends React.Component<IncidentType> {
                     <div style={{position: "static", top: "40px", paddingTop: "10px"}}>
                         <strong>Reported On: </strong>{occuredDate}
                     </div>
-                    <div style={{textAlign: "end"}}>
-                        <a href="#" onClick={this.handleLinkClick}>Read More....</a>
+                    <div style={{textAlign: "end", color: "blue"}}>
+                        <a onClick={this.handleLinkClick} style = {{cursor: "pointer"}}>Read More....</a>
                     </div>
                 </div>
                 <div>
-                    <ModalComponent incident={this.state.incident} showModal={this.state.showModal}/>
+                    <ModalComponent
+                        incident={this.state.incident}
+                        showModal={this.state.showModal}
+                        altImage={bikePic}
+                    />
                 </div>
             </div>
         );

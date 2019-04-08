@@ -1,6 +1,31 @@
 {
-    "extends": ["tslint:latest", "tslint-react"],
+    "extends": [
+        "tslint:latest",
+        "tslint-react"
+    ],
     "rules": {
-      "jsx-wrap-multiline": false
+        "jsx-wrap-multiline": false,
+        "indent": {
+            "options": [
+                "spaces",
+                4
+            ]
+        },
+        "max-line-length": [
+            true,
+            150
+        ],
+        "jsx-no-multiline-js": false,
+        "react/jsx-closing-bracket-location": [
+            "warning",
+            "props-aligned"
+        ]
+    },
+    "linterOptions": {
+        "exclude": [
+            "src/setupEnzyme.ts",
+            "src/serviceWorker.ts",
+            "src/**/*.test.{ts,tsx}"
+        ]
     }
-  }
+}

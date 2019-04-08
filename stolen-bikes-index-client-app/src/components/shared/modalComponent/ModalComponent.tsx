@@ -1,15 +1,17 @@
 import React, {Component} from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 
-interface IncidentType {
+interface IIncidentType {
     incident: {
         [key: string]: any,
     };
     showModal?: boolean;
+    altImage: string;
 }
 
-class ModalComponent extends Component<IncidentType> {
-    public state: IncidentType = {
+class ModalComponent extends Component<IIncidentType> {
+    public state: IIncidentType = {
+        altImage : "",
         incident : {},
         showModal : false,
     };
@@ -20,13 +22,15 @@ class ModalComponent extends Component<IncidentType> {
 
     public componentDidMount = () => {
         this.setState({
+            altImage: this.props.altImage,
             incident: this.props.incident,
             showModal: this.props.showModal,
         });
     }
 
-    public componentWillReceiveProps = (newProps: IncidentType) => {
+    public componentWillReceiveProps = (newProps: IIncidentType) => {
         this.setState({
+            altImage: newProps.altImage,
             incident: newProps.incident,
             showModal: newProps.showModal,
         });
@@ -40,31 +44,53 @@ class ModalComponent extends Component<IncidentType> {
 
     public render = (): JSX.Element => {
         return(
-            <Modal show={this.state.showModal} onHide={this.handleClose}>
+            <Modal
+                show={this.state.showModal}
+                onHide={this.handleClose}
+                centered={true}
+                aria-labelledby="contained-modal-title-vcenter"
+                size="lg"
+            >
             <Modal.Header closeButton={true}>
                 <Modal.Title>{this.state.incident.title}</Modal.Title>
             </Modal.Header>
             <Modal.Body >
-                <div style={{display: "table"}}>
-
-                    <div style={{float: "left", display: "table-cell"}}>
-                        {this.state.incident.description}
+                <Container>
+                    <Row className="show-grid">
+                        <Col xs={12} md={8}>
                             <div >
-                                <img src={this.state.incident.media ? this.state.incident.media.image_url : ""} style={{maxWidth: "468px", maxHeight: "468px"}}/>
+                                <img
+                                    src={this.state.incident.media ? this.state.incident.media.image_url : this.state.altImage}
+                                    style={{maxWidth: "468px", maxHeight: "468px"}}
+                                    alt={"No Image Provided"}
+                                />
                             </div>
-                        <div style={{paddingTop : "10px"}}>
-                            <div>
-                                <strong>Occurred On: </strong>{new Date(this.state.incident.occurred_at).toLocaleDateString()}
+                        </Col>
+                        <Col xs={12} md={4}>
+                            {this.state.incident.description}
+                            <div style={{paddingTop : "10px"}}>
+                                <div>
+                                    <strong>
+                                        Occurred On:
+                                    </strong>
+                                    {new Date(this.state.incident.occurred_at).toLocaleDateString()}
+                                </div>
+                                <div>
+                                    <strong>
+                                        Reported On:
+                                    </strong>
+                                    {new Date(this.state.incident.updated_at).toLocaleDateString()}
+                                </div>
+                                <div>
+                                    <strong>
+                                        Occurred At:
+                                    </strong>
+                                    {this.state.incident.address}
+                                </div>
                             </div>
-                            <div>
-                                <strong>Reported On: </strong>{new Date(this.state.incident.updated_at).toLocaleDateString()}
-                            </div>
-                            <div>
-                                <strong>Occurred At: </strong>{this.state.incident.address}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        </Col>
+                    </Row>
+                </Container>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="primary" onClick={this.handleClose}>

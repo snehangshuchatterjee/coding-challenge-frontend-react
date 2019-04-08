@@ -10,10 +10,10 @@ class BodyComponent extends Component {
         return(
             <div className="row">
                 <div className="col-md-1"/>
-				<div className="col-md-10">
-					<BikeListComponent />
-				</div>
-				<div className="col-md-1"/>
+                <div className="col-md-10">
+                    <BikeListComponent />
+                </div>
+                <div className="col-md-1"/>
             </div>
         );
     }

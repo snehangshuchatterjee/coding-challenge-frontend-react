@@ -1,10 +1,8 @@
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap/dist/js/bootstrap";
-import "jquery/dist/jquery";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import "./index.css";
+import "./resources/css/bootstrap.css";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(<App />, document.getElementById("rootContainer"));

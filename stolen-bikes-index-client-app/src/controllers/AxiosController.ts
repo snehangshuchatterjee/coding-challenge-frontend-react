@@ -3,8 +3,6 @@ import axios from "axios";
 class AxiosController {
 
     public getData = (url: string) => {
-        const me = this;
-
         return axios.get(url);
     }
 
