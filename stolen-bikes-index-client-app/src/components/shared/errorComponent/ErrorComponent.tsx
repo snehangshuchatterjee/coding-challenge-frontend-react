@@ -5,26 +5,20 @@ interface IErrorComponentProps {
     closeButtonEventHandler: () => void;
 }
 
-class ErrorComponent extends Component <IErrorComponentProps> {
-    constructor(props: IErrorComponentProps) {
-        super(props);
-    }
-
-    public render = () => {
-        return(
-            <div className="alert alert-danger">
-                <a
-                    href="#"
-                    className="close"
-                    data-dismiss="alert"
-                    onClick={this.props.closeButtonEventHandler}
-                >
-                    &times;
-                </a>
-                <strong>Error!</strong> {this.props.errorMessage}
-            </div>
-        );
-    }
+const ErrorComponent = (props: IErrorComponentProps): JSX.Element => {
+    return(
+        <div className="alert alert-danger">
+            <a
+                href="#"
+                className="close"
+                data-dismiss="alert"
+                onClick={props.closeButtonEventHandler}
+            >
+                &times;
+            </a>
+            <strong>Error!</strong> {props.errorMessage}
+        </div>
+    );
 }
 
 export default ErrorComponent;

@@ -84,7 +84,7 @@ class CardComponent extends React.Component<IIncidentType> {
                         <strong>Reported On: </strong>{occuredDate}
                     </div>
                     <div style={{textAlign: "end", color: "blue"}}>
-                        <a onClick={this.handleLinkClick} style = {{cursor: "pointer"}}>Read More....</a>
+                        <a onClick={this.handleLinkClick} style={{cursor: "pointer"}}>Read More....</a>
                     </div>
                 </div>
                 <div>

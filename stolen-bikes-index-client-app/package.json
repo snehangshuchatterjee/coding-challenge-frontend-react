@@ -63,6 +63,6 @@
             "text",
             "html"
         ],
-        "collectCoverageFrom": ["**/*.{ts,tsx}","!src/serviceWorker.ts", "!src/setupEnzyme.ts"]
+        "collectCoverageFrom": ["**/*.{ts,tsx}","!src/serviceWorker.ts", "!src/setupEnzyme.ts", "!src/index.tsx"]
     }
 }

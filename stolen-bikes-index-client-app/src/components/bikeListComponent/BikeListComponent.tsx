@@ -60,36 +60,32 @@ class BikeListComponent extends Component {
     }
 
     public componentDidMount = () => {
-        this.getData();
+        this.getData(this.getBerlinDataURL(), this.apiClass);
     }
 
-    public getData = () => {
-        this.apiClass.getData(this.getBerlinDataURL())
-        .then(
-            (response) => {
-                this.TOTAL_COUNT = response.data.incidents.length;
-                this.getDataPerPage({selected: this.LANDING_PAGE_NUMBER});
-            },
-        );
+    public getData = async (url: string, apiClass: AxiosController) => {
+        const response = await apiClass.getData(url);
+        this.TOTAL_COUNT = response.data.incidents.length;
+        this.getDataPerPage({selected: this.LANDING_PAGE_NUMBER});
     }
 
-    public getDataPerPage = (selectedItem: {selected: number}) => {
+    public getDataPerPage = async (selectedItem: {selected: number}) => {
         const pageNumber = selectedItem.selected + 1;
         const url = this.getBerlinDataURL();
 
-        this.apiClass.getDataPerPage(url, pageNumber, this.ITEMS_PER_PAGE)
-        .then((response) => {
+        try {
+            const response = await this.apiClass.getDataPerPage(url, pageNumber, this.ITEMS_PER_PAGE);
+
             this.setState({
                 incidentCount: this.TOTAL_COUNT,
                 incidents : response.data.incidents,
                 isLoading: false,
             });
-        })
-        .catch((error) => {
+        } catch (error) {
             this.setState({
                 isError : true,
             });
-        });
+        }
     }
 
     public handleSearch = (stateObj: IFilterDataObject) => {
@@ -97,7 +93,7 @@ class BikeListComponent extends Component {
         this.OCCURED_AFTER = stateObj.fromDate;
         this.OCCURED_BEFORE = stateObj.toDate;
 
-        this.getData();
+        this.getData(this.getBerlinDataURL(), this.apiClass);
     }
 
     public closeErrorMessage = () => {
