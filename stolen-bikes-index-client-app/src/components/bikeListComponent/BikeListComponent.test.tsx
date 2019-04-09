@@ -28,14 +28,16 @@ describe('BikeListComponent', () => {
                 isLoading: false
             });
             expect(wrapper.find("div").length).toEqual(1);
-            expect(wrapper.find(ErrorComponent).length).toEqual(1);
+            expect(wrapper.find("p").length).toEqual(1);
         });
         it("should render the component correctly if none of the above conditions are true", () => {
             wrapper.setState({
                 isError: false,
                 isLoading: false,
                 incidents: [
-                    {}
+                    {
+                        id: 1
+                    }
                 ]
             });
             expect(wrapper.find("div").length).toEqual(2);
@@ -91,7 +93,7 @@ describe('BikeListComponent', () => {
          it("should set the TOTAL COUNT to the state", async () => {
             var apiClass = new AxiosController();
             var url = "https://bikewise.org/api/v2/incidents??proximity=Berlin&proximity_square=100";
-            wrapper.instance().ITEMS_PER_PAGE = 10
+            wrapper.instance().ITEMS_PER_PAGE = 100
             wrapper.instance().getBerlinDataURL = () => {
                 return url;
             } 

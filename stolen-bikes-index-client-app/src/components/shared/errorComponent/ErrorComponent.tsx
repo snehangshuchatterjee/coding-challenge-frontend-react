@@ -19,6 +19,6 @@ const ErrorComponent = (props: IErrorComponentProps): JSX.Element => {
             <strong>Error!</strong> {props.errorMessage}
         </div>
     );
-}
+};
 
 export default ErrorComponent;

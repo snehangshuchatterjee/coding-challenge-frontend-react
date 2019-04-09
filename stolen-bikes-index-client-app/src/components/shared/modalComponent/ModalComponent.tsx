@@ -87,6 +87,12 @@ class ModalComponent extends Component<IIncidentType> {
                                     </strong>
                                     {this.state.incident.address}
                                 </div>
+                                <div>
+                                    <strong>
+                                        Incident Type:
+                                    </strong>
+                                    {this.state.incident.type}
+                                </div>
                             </div>
                         </Col>
                     </Row>

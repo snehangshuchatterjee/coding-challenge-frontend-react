@@ -24,6 +24,7 @@ class BikeListComponent extends Component {
     public OCCURED_BEFORE: number = 0;
     public OCCURED_AFTER: number = 0;
     public ERROR_MESSAGE: string = "Oops, Something went wrong...";
+    public TYPE = "theft";
     public apiClass: AxiosController = new AxiosController();
 
     public state = {
@@ -51,7 +52,11 @@ class BikeListComponent extends Component {
                 +
                 "&query="
                 +
-                this.QUERY;
+                this.QUERY
+                +
+                "&incident_type="
+                +
+                this.TYPE;
 
         url = (this.OCCURED_AFTER === 0) ? url : url + "&occurred_after=" + this.OCCURED_AFTER;
         url = (this.OCCURED_BEFORE === 0) ? url : url + "&occurred_before=" + this.OCCURED_BEFORE;
@@ -64,7 +69,7 @@ class BikeListComponent extends Component {
     }
 
     public getData = async (url: string, apiClass: AxiosController) => {
-        const response = await apiClass.getData(url);
+        const response = await apiClass.getTotalData(url);
         this.TOTAL_COUNT = response.data.incidents.length;
         this.getDataPerPage({selected: this.LANDING_PAGE_NUMBER});
     }
@@ -115,7 +120,7 @@ class BikeListComponent extends Component {
             return(
                 <div>
                     <FilterComponent handleSearch={this.handleSearch}/>
-                    <ErrorComponent errorMessage={this.ERROR_MESSAGE} closeButtonEventHandler={this.closeErrorMessage}/>
+                    <p style={{color: "red"}}>Oops, Something went wrong....</p>
                 </div>
             );
         } else {
